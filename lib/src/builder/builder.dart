@@ -27,6 +27,7 @@ class MPBBuilder<T extends Identifiable> extends HookWidget {
   final FirstLoadingBuilder firstLoadingBuilder;
   final NoItemBuilder noItemBuilder;
 
+  final double spacing;
   final EdgeInsets padding;
   final double loadMoreOffset;
 
@@ -36,6 +37,7 @@ class MPBBuilder<T extends Identifiable> extends HookWidget {
     required this.itemBuilder,
     required this.firstLoadingBuilder,
     required this.noItemBuilder,
+    this.spacing = HDCUISettings.paddingValue,
     this.padding = EdgeInsets.zero,
     this.loadMoreOffset = 256,
   });
@@ -80,19 +82,23 @@ class MPBBuilder<T extends Identifiable> extends HookWidget {
                   controller: scrollController,
                   padding: padding,
                   itemCount: state.items.length,
+
                   itemBuilder: (context, index) {
                     final item = state.items[index];
 
                     final isFirst = index == 0;
                     final isLast = index == state.items.length - 1;
 
-                    return itemBuilder(
-                      context,
-                      itemConstrains,
-                      item,
-                      index,
-                      isFirst: isFirst,
-                      isLast: isLast,
+                    return Padding(
+                      padding: EdgeInsets.only(bottom: isLast ? 0 : spacing),
+                      child: itemBuilder(
+                        context,
+                        itemConstrains,
+                        item,
+                        index,
+                        isFirst: isFirst,
+                        isLast: isLast,
+                      ),
                     );
                   },
                 );
