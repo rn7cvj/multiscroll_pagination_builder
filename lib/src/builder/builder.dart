@@ -66,7 +66,8 @@ class MPBBuilder<T extends Identifiable> extends HookWidget {
         );
         return BlocBuilder<MPBController<T>, MBDControllerState<T>>(
           bloc: controller,
-          builder: (context, state) => HDCStateSwitcher(
+          builder: (context, state) => AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
             child: Builder(
               key: ValueKey(state),
               builder: (context) {
