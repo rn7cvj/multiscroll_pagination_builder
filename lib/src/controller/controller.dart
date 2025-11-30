@@ -10,30 +10,32 @@ abstract interface class Identifiable {
 
 typedef DataLoader<T extends Identifiable> =
     Future<List<T>> Function(
-  int pageIndex,
-  int pageSize, {
-  Map<String, dynamic>? filters,
-});
+      int pageIndex,
+      int pageSize, {
+      Map<String, dynamic>? filters,
+    });
 
 class MPBController<T extends Identifiable>
     extends Cubit<MBDControllerState<T>> {
   final DataLoader<T> dataLoader;
   final int initialPageIndex;
   final int pageSize;
-  late Map<String, dynamic>? filters;
+  late Map<String, dynamic>? _filters;
   bool _isLoading = false;
 
   MPBController({
     required this.dataLoader,
-    Map<String, dynamic>? filters,
     this.initialPageIndex = 0,
     this.pageSize = 128,
+    Map<String, dynamic>? filters,
   }) : super(
          MBDControllerState<T>(items: <T>[], currentPage: initialPageIndex - 1),
        ) {
-    this.filters = filters;
+    _filters = filters;
     loadNexPage();
   }
+
+  Map<String, dynamic>? get filters => _filters;
 
   Future<void> loadNexPage() async {
     if (_isLoading) return;
@@ -46,7 +48,7 @@ class MPBController<T extends Identifiable>
       final newItems = await dataLoader(
         state.currentPage + 1,
         pageSize,
-        filters: filters,
+        filters: _filters,
       );
 
       emit(
@@ -64,19 +66,24 @@ class MPBController<T extends Identifiable>
     }
   }
 
-  Future<void> reset({Map<String, dynamic>? newFilters}) async {
-    filters = newFilters;
+  Future<void> refresh() async {
     _isLoading = false;
     emit(
-      MBDControllerState<T>(
-        items: <T>[],
-        currentPage: initialPageIndex - 1,
-      ),
+      MBDControllerState<T>(items: <T>[], currentPage: initialPageIndex - 1),
+    );
+    await loadNexPage();
+  }
+
+  Future<void> reset({Map<String, dynamic>? newFilters}) async {
+    _filters = newFilters;
+    _isLoading = false;
+    emit(
+      MBDControllerState<T>(items: <T>[], currentPage: initialPageIndex - 1),
     );
     await loadNexPage();
   }
 
   Future<void> updateFilters(Map<String, dynamic>? newFilters) async {
-    filters = newFilters;
+    _filters = newFilters;
   }
 }
