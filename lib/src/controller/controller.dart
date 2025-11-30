@@ -9,22 +9,29 @@ abstract interface class Identifiable {
 }
 
 typedef DataLoader<T extends Identifiable> =
-    Future<List<T>> Function(int pageIndex, int pageSize);
+    Future<List<T>> Function(
+  int pageIndex,
+  int pageSize, {
+  Map<String, dynamic>? filters,
+});
 
 class MPBController<T extends Identifiable>
     extends Cubit<MBDControllerState<T>> {
   final DataLoader<T> dataLoader;
   final int initialPageIndex;
   final int pageSize;
+  late Map<String, dynamic>? filters;
   bool _isLoading = false;
 
   MPBController({
     required this.dataLoader,
+    Map<String, dynamic>? filters,
     this.initialPageIndex = 0,
     this.pageSize = 128,
   }) : super(
          MBDControllerState<T>(items: <T>[], currentPage: initialPageIndex - 1),
        ) {
+    this.filters = filters;
     loadNexPage();
   }
 
@@ -36,7 +43,11 @@ class MPBController<T extends Identifiable>
     _isLoading = true;
 
     try {
-      final newItems = await dataLoader(state.currentPage + 1, pageSize);
+      final newItems = await dataLoader(
+        state.currentPage + 1,
+        pageSize,
+        filters: filters,
+      );
 
       emit(
         MBDControllerState(
@@ -51,5 +62,21 @@ class MPBController<T extends Identifiable>
     } finally {
       _isLoading = false;
     }
+  }
+
+  Future<void> reset({Map<String, dynamic>? newFilters}) async {
+    filters = newFilters;
+    _isLoading = false;
+    emit(
+      MBDControllerState<T>(
+        items: <T>[],
+        currentPage: initialPageIndex - 1,
+      ),
+    );
+    await loadNexPage();
+  }
+
+  Future<void> updateFilters(Map<String, dynamic>? newFilters) async {
+    filters = newFilters;
   }
 }
