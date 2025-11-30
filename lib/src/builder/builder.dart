@@ -1,7 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:hdc_uikit/hdc_uikit.dart';
 
 import '../controller/controller.dart';
 
@@ -37,7 +36,7 @@ class MPBBuilder<T extends Identifiable> extends HookWidget {
     required this.itemBuilder,
     required this.firstLoadingBuilder,
     required this.noItemBuilder,
-    this.spacing = HDCUISettings.paddingValue,
+    this.spacing = 16.0,
     this.padding = EdgeInsets.zero,
     this.loadMoreOffset = 256,
   });
