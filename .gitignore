@@ -30,5 +30,8 @@ migrate_working_dir/
 .flutter-plugins-dependencies
 build/
 
-
 .vscode/settings.json
+
+# FVM Version Cache
+.fvm/
+.fvmrc

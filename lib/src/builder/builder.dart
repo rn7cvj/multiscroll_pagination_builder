@@ -65,46 +65,52 @@ class MPBBuilder<T extends Identifiable> extends HookWidget {
         );
         return BlocBuilder<MPBController<T>, MBDControllerState<T>>(
           bloc: controller,
-          builder: (context, state) => AnimatedSwitcher(
-            duration: const Duration(milliseconds: 300),
-            child: Builder(
-              key: ValueKey(state),
-              builder: (context) {
-                if (state.isFirstPage) {
-                  return firstLoadingBuilder(context, itemConstrains);
-                }
+          builder: (context, state) {
+            if (!state.isFirstPage && state.items.isNotEmpty) {
+              return ListView.builder(
+                controller: scrollController,
+                padding: padding,
+                itemCount: state.items.length,
+                itemBuilder: (context, index) {
+                  final item = state.items[index];
 
-                if (state.items.isEmpty) {
+                  final isFirst = index == 0;
+                  final isLast = index == state.items.length - 1;
+
+                  return Padding(
+                    padding: EdgeInsets.only(bottom: isLast ? 0 : spacing),
+                    child: itemBuilder(
+                      context,
+                      itemConstrains,
+                      item,
+                      index,
+                      isFirst: isFirst,
+                      isLast: isLast,
+                    ),
+                  );
+                },
+              );
+            }
+
+            final viewKey =
+                state.isFirstPage
+                    ? const ValueKey('first')
+                    : const ValueKey('empty');
+
+            return AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              child: Builder(
+                key: viewKey,
+                builder: (context) {
+                  if (state.isFirstPage) {
+                    return firstLoadingBuilder(context, itemConstrains);
+                  }
+
                   return noItemBuilder(context, itemConstrains);
-                }
-
-                return ListView.builder(
-                  controller: scrollController,
-                  padding: padding,
-                  itemCount: state.items.length,
-
-                  itemBuilder: (context, index) {
-                    final item = state.items[index];
-
-                    final isFirst = index == 0;
-                    final isLast = index == state.items.length - 1;
-
-                    return Padding(
-                      padding: EdgeInsets.only(bottom: isLast ? 0 : spacing),
-                      child: itemBuilder(
-                        context,
-                        itemConstrains,
-                        item,
-                        index,
-                        isFirst: isFirst,
-                        isLast: isLast,
-                      ),
-                    );
-                  },
-                );
-              },
-            ),
-          ),
+                },
+              ),
+            );
+          },
         );
       },
     );

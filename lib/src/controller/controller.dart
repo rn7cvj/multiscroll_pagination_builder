@@ -86,4 +86,22 @@ class MPBController<T extends Identifiable>
   Future<void> updateFilters(Map<String, dynamic>? newFilters) async {
     _filters = newFilters;
   }
+
+  bool updateById(T item) {
+    final index = state.items.indexWhere((it) => it.mpbId == item.mpbId);
+    if (index == -1) return false;
+
+    final updatedItems = [...state.items];
+    updatedItems[index] = item;
+    emit(state.copyWith(items: updatedItems));
+    return true;
+  }
+
+  bool deleteById(int id) {
+    final updatedItems = state.items.where((it) => it.mpbId != id).toList();
+    if (updatedItems.length == state.items.length) return false;
+
+    emit(state.copyWith(items: updatedItems));
+    return true;
+  }
 }
