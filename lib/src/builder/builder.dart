@@ -29,6 +29,7 @@ class MPBBuilder<T extends Identifiable> extends HookWidget {
   final double spacing;
   final EdgeInsets padding;
   final double loadMoreOffset;
+  final bool reversed;
 
   const MPBBuilder({
     super.key,
@@ -39,6 +40,7 @@ class MPBBuilder<T extends Identifiable> extends HookWidget {
     this.spacing = 16.0,
     this.padding = EdgeInsets.zero,
     this.loadMoreOffset = 256,
+    this.reversed = false,
   });
 
   @override
@@ -69,6 +71,7 @@ class MPBBuilder<T extends Identifiable> extends HookWidget {
             if (!state.isFirstPage && state.items.isNotEmpty) {
               return ListView.builder(
                 controller: scrollController,
+                reverse: reversed,
                 padding: padding,
                 itemCount: state.items.length,
                 itemBuilder: (context, index) {
