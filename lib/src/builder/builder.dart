@@ -74,14 +74,24 @@ class MPBBuilder<T extends Identifiable> extends HookWidget {
                 reverse: reversed,
                 padding: padding,
                 itemCount: state.items.length,
+
                 itemBuilder: (context, index) {
                   final item = state.items[index];
 
                   final isFirst = index == 0;
                   final isLast = index == state.items.length - 1;
 
+                  double top = isLast ? 0 : spacing;
+                  double bottom = isLast ? 0 : spacing;
+
+                  if (reversed) {
+                    bottom = 0;
+                  } else {
+                    top = 0;
+                  }
+
                   return Padding(
-                    padding: EdgeInsets.only(bottom: isLast ? 0 : spacing),
+                    padding: EdgeInsets.only(top: top, bottom: bottom),
                     child: itemBuilder(
                       context,
                       itemConstrains,
@@ -95,10 +105,9 @@ class MPBBuilder<T extends Identifiable> extends HookWidget {
               );
             }
 
-            final viewKey =
-                state.isFirstPage
-                    ? const ValueKey('first')
-                    : const ValueKey('empty');
+            final viewKey = state.isFirstPage
+                ? const ValueKey('first')
+                : const ValueKey('empty');
 
             return AnimatedSwitcher(
               duration: const Duration(milliseconds: 300),
