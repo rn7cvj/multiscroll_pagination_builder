@@ -104,4 +104,20 @@ class MPBController<T extends Identifiable>
     emit(state.copyWith(items: updatedItems));
     return true;
   }
+
+  bool insert(int index, T item) {
+    if (index < 0 || index > state.items.length) return false;
+
+    final updatedItems = [...state.items]..insert(index, item);
+    emit(state.copyWith(items: updatedItems));
+    return true;
+  }
+
+  void addFirst(T item) {
+    insert(0, item);
+  }
+
+  void addLast(T item) {
+    insert(state.items.length, item);
+  }
 }
