@@ -94,8 +94,9 @@ class MPBBuilder<T extends Identifiable> extends HookWidget {
                   final isFirst = index == 0;
                   final isLast = index == state.items.length - 1;
 
-                  double top = isLast ? 0 : spacing;
-                  double bottom = isLast ? 0 : spacing;
+                  final itemSpacing = isLast && !showNextPageLoader ? 0.0 : spacing;
+                  double top = itemSpacing;
+                  double bottom = itemSpacing;
 
                   if (reversed) {
                     bottom = 0;
