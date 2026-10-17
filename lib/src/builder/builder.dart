@@ -17,6 +17,9 @@ typedef ItemBuilder<T extends Identifiable> =
 typedef FirstLoadingBuilder =
     Widget Function(BuildContext context, BoxConstraints constrains);
 
+typedef NextPageLoadingBuilder =
+    Widget Function(BuildContext context, int currentPage);
+
 typedef NoItemBuilder =
     Widget Function(BuildContext context, BoxConstraints constrains);
 
@@ -24,6 +27,9 @@ class MPBBuilder<T extends Identifiable> extends HookWidget {
   final MPBController<T> controller;
   final ItemBuilder<T> itemBuilder;
   final FirstLoadingBuilder firstLoadingBuilder;
+  /// Builds the trailing loader while more pages are available.
+  /// Receives the index of the currently loaded page.
+  final NextPageLoadingBuilder? nextPageLoadingBuilder;
   final NoItemBuilder noItemBuilder;
 
   final double spacing;
@@ -37,6 +43,7 @@ class MPBBuilder<T extends Identifiable> extends HookWidget {
     required this.itemBuilder,
     required this.firstLoadingBuilder,
     required this.noItemBuilder,
+    this.nextPageLoadingBuilder,
     this.spacing = 16.0,
     this.padding = EdgeInsets.zero,
     this.loadMoreOffset = 256,
@@ -69,13 +76,19 @@ class MPBBuilder<T extends Identifiable> extends HookWidget {
           bloc: controller,
           builder: (context, state) {
             if (!state.isFirstPage && state.items.isNotEmpty) {
+              final showNextPageLoader =
+                  !state.isLastPage && nextPageLoadingBuilder != null;
               return ListView.builder(
                 controller: scrollController,
                 reverse: reversed,
                 padding: padding,
-                itemCount: state.items.length,
+                itemCount: state.items.length + (showNextPageLoader ? 1 : 0),
 
                 itemBuilder: (context, index) {
+                  if (index == state.items.length) {
+                    return nextPageLoadingBuilder!(context, state.currentPage);
+                  }
+
                   final item = state.items[index];
 
                   final isFirst = index == 0;
